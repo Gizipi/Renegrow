@@ -462,6 +462,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coreData: {fileID: 11400000, guid: 9e47c9e676bd95643af1023b83102e73, type: 2}
+  mainCamera: {fileID: 330585545}
+  boardSlotLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!4 &1141073403
 Transform:
   m_ObjectHideFlags: 0

@@ -63,5 +63,6 @@ public class Match
             _currentSeason = ESeason.Spring;
         }
         _events.SeasonChange(_currentSeason);
+        _state = EMatchState.Playing;
     }
 }

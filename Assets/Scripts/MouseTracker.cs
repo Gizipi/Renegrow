@@ -1,6 +1,7 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class MouseTracker : IMatchBehaviour 
+public class MouseTracker : IMatchBehaviour
 {
 	private readonly Board _board;
 	private readonly Camera _cameraOverride;
@@ -12,6 +13,7 @@ public class MouseTracker : IMatchBehaviour
 	public RaycastHit2D LastHit { get; private set; }
 	public CircleCollider2D HoveredCircleCollider { get; private set; }
 	public Collider2D HoveredCollider { get; private set; }
+	private SpriteButton _hoveredSpriteButton;
 
 	public MouseTracker(Board board, Camera cameraOverride = null, LayerMask layerMask = default)
 	{
@@ -20,19 +22,67 @@ public class MouseTracker : IMatchBehaviour
 		_layerMask = layerMask == default ? ~0 : layerMask;
 	}
 
-	public void Update(float deltaTime) {
+	public void Update(float deltaTime)
+	{
 		Camera cam = _cameraOverride != null ? _cameraOverride : Camera.main;
 		if (cam == null)
 			return;
 
-		Vector3 mouseScreen = Input.mousePosition;
+		Pointer pointer = Pointer.current;
+		if (pointer == null)
+		{
+			if (_hoveredSpriteButton != null)
+			{
+				_hoveredSpriteButton.OnHoverEnd();
+			}
+			_hoveredSpriteButton = null;
+			return;
+		}
+
+		Vector2 screenPoint = pointer.position.ReadValue();
+		Vector3 mouseScreen = new Vector3(screenPoint.x, screenPoint.y, 0f);
 		mouseScreen.z = -cam.transform.position.z;
 		MouseWorldPosition = cam.ScreenToWorldPoint(mouseScreen);
 
-		Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+		Ray ray = cam.ScreenPointToRay(screenPoint);
 		LastHit = Physics2D.GetRayIntersection(ray, Mathf.Infinity, _layerMask);
 
 		HoveredCollider = LastHit.collider;
-		HoveredCircleCollider = HoveredCollider as CircleCollider2D;
+
+		if (HoveredCollider != null)
+		{
+			HoverLogic();
+			if (pointer.press.wasPressedThisFrame)
+			{
+				Debug.Log("MouseTracker: Player clicked");
+				_hoveredSpriteButton.OnClick();
+			}
+		}
+		else
+		{
+			if (_hoveredSpriteButton != null)
+			{
+				_hoveredSpriteButton.OnHoverEnd();
+			}
+			_hoveredSpriteButton = null;
+		}
+	}
+
+	private void HoverLogic()
+	{
+		SpriteButton spriteButton = HoveredCollider.GetComponent<SpriteButton>();
+
+		if (spriteButton != _hoveredSpriteButton)
+		{
+			if (_hoveredSpriteButton != null)
+			{
+				_hoveredSpriteButton.OnHoverEnd();
+			}
+			if (spriteButton != null)
+			{
+				spriteButton.OnHoverStart();
+			}
+		}
+		_hoveredSpriteButton = spriteButton;
 	}
 }

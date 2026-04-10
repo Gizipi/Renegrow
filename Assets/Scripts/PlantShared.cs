@@ -30,5 +30,6 @@ public class PlantGrowthStage
     public Sprite deadVisual;
     public int capacity;
     public LeafGroup[] production;
+    public int range;
     public ESeason[] productionSeasons;
 }

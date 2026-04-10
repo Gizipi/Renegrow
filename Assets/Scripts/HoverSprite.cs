@@ -26,6 +26,8 @@ public class CapacityUi : MonoBehaviour
 
 	public void RemoveResource(ELeafType leafType)
 	{
+		if(_resources[leafType].Count <= 0)
+			return;
 		_resources[leafType].RemoveAt(0);
 		Destroy(_resources[leafType][0]);
 		_resources[leafType].RemoveAt(0);

@@ -1,10 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
-using NUnit.Framework;
 using System.Linq;
 
 public static class BoardGeneration
 {
+	/// <summary>Axial (q, r) hex neighbors; must stay in sync with <see cref="BoardData.GridToWorld"/>.</summary>
+	private static readonly (int dq, int dr, EDirection dir)[] HexAxialNeighbours =
+	{
+		(1, 0, EDirection.upRight),
+		(1, -1, EDirection.up),
+		(0, -1, EDirection.upLeft),
+		(-1, 0, EDirection.downLeft),
+		(-1, 1, EDirection.down),
+		(0, 1, EDirection.downRight),
+	};
 	public static Board GenerateBoard(CoreData coreData)
 	{
 		Board board = new Board(GenerateSlots(coreData), coreData.boardData, coreData.matchEvents);
@@ -40,6 +49,7 @@ public static class BoardGeneration
 		}
 
 		int[] plantIndexes = GeneratePlantIndexes(coreData.boardGenerationData.deadPlantCount, slotCount);
+		RangeBehaviour rangeBehaviour = new RangeBehaviour();
 
 		for (int i = 0; i < slotCount; i++)
 		{
@@ -50,28 +60,49 @@ public static class BoardGeneration
 			TileData tileData = tileDatas[randomIndex];
 			tileDatas.RemoveAt(randomIndex);
 			GameObject tileVisual = GameObject.Instantiate(coreData.boardGenerationData.tileVisualPrefab);
-			GrowTile slot = new GrowTile(tileVisual, coreData.uiData, coreData.boardData, tileData);
+			GrowTile slot = new GrowTile(tileVisual, coreData.uiData, coreData.boardData, tileData, rangeBehaviour);
 			slot.ProvideEvents(coreData.matchEvents);
 			slot.SetPosition(position);
 			slots.Add(slot);
 			tileCounts[tileData.tileType]++;
-			if(tileData.tileType == ETileType.Grass)
+			if (tileData.tileType == ETileType.Grass)
 			{
 				Debug.Log("Seed grass");
-				slot.Seed(coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]);
+				slot.Seed(new Plant(coreData.uiData, coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]));
 				slot.Plant.Grow();
 				slot.Plant.Grow();
 			}
 			else if (plantIndexes.Contains(i))
 			{
 				Debug.Log("Seed plant");
-				slot.Seed(coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]);
+				slot.Seed(new Plant(coreData.uiData, coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]));
 				slot.Plant.Grow();
 				slot.Plant.Die();
 			}
 		}
 
+		ConnectHexNeighbours(slots);
 		return slots.ToArray();
+	}
+
+	private static void ConnectHexNeighbours(List<GrowTile> slots)
+	{
+		var byAxial = new Dictionary<(int q, int r), GrowTile>(slots.Count);
+		foreach (GrowTile slot in slots)
+		{
+			BoardSlotPosition p = slot.position;
+			byAxial[(p.x, p.y)] = slot;
+		}
+
+		foreach (GrowTile slot in slots)
+		{
+			BoardSlotPosition p = slot.position;
+			foreach ((int dq, int dr, EDirection dir) in HexAxialNeighbours)
+			{
+				if (byAxial.TryGetValue((p.x + dq, p.y + dr), out GrowTile neighbour))
+					slot.SetNeighbour(dir, neighbour);
+			}
+		}
 	}
 
 	private static int[] GeneratePlantIndexes(int deadPlantCount, int tileCount)

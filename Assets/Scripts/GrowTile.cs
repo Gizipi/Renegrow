@@ -25,13 +25,15 @@ public class GrowTile : BoardSlot
 	private readonly UiData _uiData;
 	private MatchEvents _matchEvents;
 	private ESeason _currentSeason = ESeason.Spring;
+	private RangeBehaviour _rangeBehaviour;
 
-	public GrowTile(GameObject tileVisual, UiData uiData, BoardData boardData, TileData tileData) : base(tileVisual, boardData)
+	public GrowTile(GameObject tileVisual, UiData uiData, BoardData boardData, TileData tileData, RangeBehaviour rangeBehaviour) : base(tileVisual, boardData)
 	{
 		_tileData = tileData;
 		_uiData = uiData;
-		
+
 		_tileSpriteRenderer = _slotVisual.GetComponent<SpriteRenderer>();
+		_rangeBehaviour = rangeBehaviour;
 	}
 
 	public void ProvideEvents(MatchEvents events)
@@ -58,14 +60,33 @@ public class GrowTile : BoardSlot
 			_plant.ChangeSeason(season);
 	}
 
-	public void Seed(PlantData plantData)
+	public void Seed(Plant plant)
 	{
 		if (_plant != null)
+		{
+			TransferLeaf(plant);
 			return;
+		}
 
-		_plant = new Plant(_uiData, plantData);
+		_plant = new Plant(_uiData, plant.PlantData);
+		if(plant.Leaves.Count > 0)
+		{
+			plant.RemoveLeaf(plant.Leaves[0]);
+		}
 		_plant.Seed();
 		SetPlantPosition();
+	}
+
+	public void TransferLeaf(Plant plant)
+	{
+		if (_plant.Leaves.Count >= _plant.CurrentGrowthStage.capacity || plant.Leaves.Count <= 0)
+		{
+			return;
+		}
+
+		ELeafType leafType = plant.Leaves[0];
+		plant.RemoveLeaf(leafType);
+		_plant.AddLeaf(leafType);
 	}
 
 	public override void SetPosition(BoardSlotPosition position)
@@ -77,7 +98,7 @@ public class GrowTile : BoardSlot
 	private void SetPlantPosition()
 	{
 		if (_plant != null)
-			_plant.PlantVisual.transform.position = _boardData.GridToWorld(position);
+			_plant.SetPosition(_boardData.GridToWorld(position));
 	}
 
 	public override void Added()
@@ -98,6 +119,7 @@ public class GrowTile : BoardSlot
 		{
 			_plant.OnClicked();
 		}
+		_rangeBehaviour.ProvideTile(this);
 	}
 
 	public override void OnHoverStart()

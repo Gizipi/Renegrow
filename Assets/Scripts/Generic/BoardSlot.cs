@@ -25,6 +25,7 @@ public class BoardSlotPosition
 
 public abstract class BoardSlot
 {
+    private readonly SpriteButton _spriteButton;
     private BoardSlotPosition _position;
     public BoardSlotPosition position
     {
@@ -48,9 +49,19 @@ public abstract class BoardSlot
     {
         _slotVisual = slotVisual;
         _boardData = boardData;
+        _spriteButton = slotVisual.GetComponent<SpriteButton>();
         _neighbours = new Dictionary<EDirection, BoardSlot>();
+        SubscribeToEvents();
     }
     
+    private void SubscribeToEvents()
+    {
+        if (_spriteButton == null)
+            return;
+        _spriteButton.events.onClick += OnClicked;
+        _spriteButton.events.onHoverStart += OnHoverStart;
+        _spriteButton.events.onHoverEnd += OnHoverEnd;
+    }
 
     public virtual void SetPosition(BoardSlotPosition position)
     {

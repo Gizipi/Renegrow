@@ -9,7 +9,6 @@ public class PlantData : ScriptableObject
     public PlantGrowthStage[] startGrowthStages;
     public Dictionary<EPlantGrowthStage, PlantGrowthStage> growthStages = new();
     public LeafGroup[] productionCost;
-    public Sprite hoverVisual;
 
     private void OnEnable()
     {

@@ -17,17 +17,19 @@ MonoBehaviour:
   startGrowthStages:
   - growthStage: 0
     livingVisual: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-    deadVisual: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+    deadVisual: {fileID: 1482991970, guid: fa5f15faaf63d964c92327f4fc905d8c, type: 3}
     capacity: 0
     production: []
+    range: 0
     productionSeasons: 
   - growthStage: 1
     livingVisual: {fileID: 1545574778, guid: cee29cd908169ad4e9bcd1b54854ad8c, type: 3}
-    deadVisual: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+    deadVisual: {fileID: 1482991970, guid: fa5f15faaf63d964c92327f4fc905d8c, type: 3}
     capacity: 1
     production:
     - type: 0
       count: 1
+    range: 0
     productionSeasons: 00000000
   - growthStage: 2
     livingVisual: {fileID: 1995684675, guid: cee29cd908169ad4e9bcd1b54854ad8c, type: 3}
@@ -36,6 +38,7 @@ MonoBehaviour:
     production:
     - type: 0
       count: 1
+    range: 1
     productionSeasons: 0000000002000000
   - growthStage: 3
     livingVisual: {fileID: 1995684675, guid: cee29cd908169ad4e9bcd1b54854ad8c, type: 3}
@@ -44,14 +47,15 @@ MonoBehaviour:
     production:
     - type: 0
       count: 2
+    range: 2
     productionSeasons: 000000000200000001000000
   - growthStage: 4
     livingVisual: {fileID: 1482991970, guid: fa5f15faaf63d964c92327f4fc905d8c, type: 3}
     deadVisual: {fileID: 1482991970, guid: fa5f15faaf63d964c92327f4fc905d8c, type: 3}
     capacity: 0
     production: []
+    range: 0
     productionSeasons: 
   productionCost:
   - type: 0
     count: 3
-  hoverVisual: {fileID: 0}
