@@ -1,0 +1,34 @@
+using UnityEngine;
+public enum EPlantGrowthStage
+{
+    Seed,
+    Seedling,
+    Young,
+    Mature,
+    Dead,
+}
+
+public enum ELeafType
+{
+    Green,
+    Yellow,
+    Purple,
+}
+
+[System.Serializable]
+public class LeafGroup
+{
+    public ELeafType type;
+    public int count;
+}
+
+[System.Serializable]
+public class PlantGrowthStage
+{
+    public EPlantGrowthStage growthStage;
+    public Sprite livingVisual;
+    public Sprite deadVisual;
+    public int capacity;
+    public LeafGroup[] production;
+    public ESeason[] productionSeasons;
+}
