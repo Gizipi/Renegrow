@@ -1,6 +1,6 @@
 using UnityEngine;
 using System;
-using static MatchEvents;
+using static SeasonEvents;
 
 public class SpriteButtonEvents
 {

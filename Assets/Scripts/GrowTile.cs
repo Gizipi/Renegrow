@@ -1,5 +1,5 @@
 using UnityEngine;
-using static MatchEvents;
+using static SeasonEvents;
 using System;
 
 public class GrowTile : BoardSlot
@@ -14,7 +14,7 @@ public class GrowTile : BoardSlot
 	}
 	private readonly CapacityUi _capacityParent;
 	private readonly SpriteRenderer _tileSpriteRenderer;
-	private readonly TileData _tileData;
+	private TileData _tileData;
 	public TileData TileData
 	{
 		get
@@ -23,7 +23,7 @@ public class GrowTile : BoardSlot
 		}
 	}
 	private readonly UiData _uiData;
-	private MatchEvents _matchEvents;
+	private SeasonEvents _matchEvents;
 	private ESeason _currentSeason = ESeason.Spring;
 	private RangeBehaviour _rangeBehaviour;
 
@@ -36,7 +36,7 @@ public class GrowTile : BoardSlot
 		_rangeBehaviour = rangeBehaviour;
 	}
 
-	public void ProvideEvents(MatchEvents events)
+	public void ProvideEvents(SeasonEvents events)
 	{
 		_matchEvents = events;
 		SubscribeToEvents();
@@ -62,6 +62,9 @@ public class GrowTile : BoardSlot
 
 	public void Seed(Plant plant)
 	{
+		if (_tileData.tileType == ETileType.dirt)
+			return;
+
 		if (_plant != null)
 		{
 			TransferLeaf(plant);
@@ -69,12 +72,50 @@ public class GrowTile : BoardSlot
 		}
 
 		_plant = new Plant(_uiData, plant.PlantData);
-		if(plant.Leaves.Count > 0)
+		if (plant.Leaves.Count > 0)
 		{
 			plant.RemoveLeaf(plant.Leaves[0]);
 		}
 		_plant.Seed();
 		SetPlantPosition();
+	}
+
+	public void Seed(PlantData plantData)
+	{
+		_plant = new Plant(_uiData, plantData);
+		_plant.Seed();
+		SetPlantPosition();
+	}
+
+	public void Spread()
+	{
+		Debug.Log("attempting to spread");
+		if (_plant == null)
+			return;
+		if (_plant.Leaves.Count <= 0)
+			return;
+
+		Debug.Log("spreading");
+		foreach (EDirection direction in Enum.GetValues(typeof(EDirection)))
+		{
+			if (!neighbours.ContainsKey(direction))
+				continue;
+			GrowTile neighbour = (GrowTile)neighbours[direction];
+			if (neighbour == null)
+				continue;
+
+			if (_tileData.spreadableTiles.Contains(neighbour.TileData.tileType))
+			{
+				neighbour.SetTileData(_tileData);
+			}
+		}
+		_plant.RemoveLeaf(_plant.Leaves[0]);
+	}
+
+	public void SetTileData(TileData tileData)
+	{
+		_tileData = tileData;
+		_tileSpriteRenderer.sprite = _tileData.tileSprites[_currentSeason];
 	}
 
 	public void TransferLeaf(Plant plant)

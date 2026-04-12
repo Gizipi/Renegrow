@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static SeasonEvents;
 
 public class Match
 {
     private EMatchState _state = EMatchState.Idle;
     private Board _board;
-    private MatchEvents _events;
-    public MatchEvents events
+    private SeasonEvents _events;
+    public SeasonEvents events
     {
         get
         {
@@ -16,11 +17,13 @@ public class Match
     }
     private ESeason _currentSeason = ESeason.Winter;
     private List<IMatchBehaviour> _behaviour = new();
+    private AudioBank _audioBank;
 
-    public Match(Board board, MatchEvents events)
+    public Match(Board board, SeasonEvents events, AudioBank audioBank)
     {
         _board = board;
         _events = events;
+        _audioBank = audioBank;
     }
 
     public virtual void Enable()
@@ -52,17 +55,19 @@ public class Match
 
     public virtual void StartMatch()
     {
-        changeToNextSeason();
+        _events.onSeasonChange += OnSeasonChange;
+        _events.SeasonChange(_currentSeason);
     }
 
-    private void changeToNextSeason()
+    private void OnSeasonChange(ESeason season)
     {
+        _audioBank.StopAudio(_currentSeason.ToString());
         _currentSeason++;
         if (_currentSeason > ESeason.Winter)
         {
             _currentSeason = ESeason.Spring;
         }
-        _events.SeasonChange(_currentSeason);
         _state = EMatchState.Playing;
+        _audioBank.PlayAudio(_currentSeason.ToString(), true);
     }
 }

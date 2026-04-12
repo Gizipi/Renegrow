@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 2661803152014749217}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.92234, y: -0, z: 8.59514}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b65819ba983c3a42ab61727ed86366a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CapacityUi
-  CapacitySprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+  CapacitySprite: {fileID: 1399616170, guid: 51d1ffc93c08d5f49924e40f8577b7b3, type: 3}
   CapacityPrefab: {fileID: 3135293854284482797, guid: ff2ef2ba9be094e43b8e94bb144a16b7, type: 3}
   ResourcePrefab: {fileID: 8169712177186691831, guid: 69d251fdfc956044d9e22f72b0fc1cd9, type: 3}

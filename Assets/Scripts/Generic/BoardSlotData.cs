@@ -22,7 +22,7 @@ public class BoardData : ScriptableObject
 	public HexOrientation orientation = HexOrientation.FlatTop;
 
 	/// <summary>
-	/// World position for a slot. Grid (x, y) is interpreted as axial coordinates (q, r).
+	/// World position for a slot. Grid (x, y) is odd-r offset (column, row), not raw axial—same convention as <c>BoardGeneration.ConnectHexNeighbours</c>.
 	/// </summary>
 	public Vector3 GridToWorld(BoardSlotPosition grid)
 	{

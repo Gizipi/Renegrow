@@ -4,7 +4,10 @@ using System.Linq;
 
 public static class BoardGeneration
 {
-	/// <summary>Axial (q, r) hex neighbors; must stay in sync with <see cref="BoardData.GridToWorld"/>.</summary>
+	/// <summary>
+	/// Axial (dq, dr) steps in cube space (q + r + s = 0). Stored grid (x,y) is odd-r offset (column, row)
+	/// matching <see cref="BoardData.GridToWorld"/>; use <see cref="NeighborInStoredGrid"/> to apply these deltas.
+	/// </summary>
 	private static readonly (int dq, int dr, EDirection dir)[] HexAxialNeighbours =
 	{
 		(1, 0, EDirection.upRight),
@@ -14,13 +17,30 @@ public static class BoardGeneration
 		(-1, 1, EDirection.down),
 		(0, 1, EDirection.downRight),
 	};
-	public static Board GenerateBoard(CoreData coreData)
+
+	private static int AxialRFromStored(int col, int row)
 	{
-		Board board = new Board(GenerateSlots(coreData), coreData.boardData, coreData.matchEvents);
+		return row - Mathf.FloorToInt(col * 0.5f);
+	}
+
+	private static BoardSlotPosition StoredFromAxial(int qAxial, int rAxial)
+	{
+		int row = rAxial + Mathf.FloorToInt(qAxial * 0.5f);
+		return new BoardSlotPosition(qAxial, row);
+	}
+
+	private static BoardSlotPosition NeighborInStoredGrid(BoardSlotPosition p, int dqAxial, int drAxial)
+	{
+		int rAx = AxialRFromStored(p.x, p.y);
+		return StoredFromAxial(p.x + dqAxial, rAx + drAxial);
+	}
+	public static Board GenerateBoard(CoreData coreData, SeasonData seasonData)
+	{
+		Board board = new Board(GenerateSlots(coreData, seasonData), coreData.boardData, seasonData.Events);
 		return board;
 	}
 
-	private static BoardSlot[] GenerateSlots(CoreData coreData)
+	private static BoardSlot[] GenerateSlots(CoreData coreData, SeasonData seasonData)
 	{
 		List<GrowTile> slots = new List<GrowTile>();
 		Dictionary<ETileType, int> tileCapacities = new Dictionary<ETileType, int>();
@@ -61,21 +81,21 @@ public static class BoardGeneration
 			tileDatas.RemoveAt(randomIndex);
 			GameObject tileVisual = GameObject.Instantiate(coreData.boardGenerationData.tileVisualPrefab);
 			GrowTile slot = new GrowTile(tileVisual, coreData.uiData, coreData.boardData, tileData, rangeBehaviour);
-			slot.ProvideEvents(coreData.matchEvents);
+			slot.ProvideEvents(seasonData.Events);
 			slot.SetPosition(position);
 			slots.Add(slot);
 			tileCounts[tileData.tileType]++;
 			if (tileData.tileType == ETileType.Grass)
 			{
 				Debug.Log("Seed grass");
-				slot.Seed(new Plant(coreData.uiData, coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]));
+				slot.Seed(coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]);
 				slot.Plant.Grow();
 				slot.Plant.Grow();
 			}
 			else if (plantIndexes.Contains(i))
 			{
 				Debug.Log("Seed plant");
-				slot.Seed(new Plant(coreData.uiData, coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]));
+				slot.Seed(coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]);
 				slot.Plant.Grow();
 				slot.Plant.Die();
 			}
@@ -87,11 +107,11 @@ public static class BoardGeneration
 
 	private static void ConnectHexNeighbours(List<GrowTile> slots)
 	{
-		var byAxial = new Dictionary<(int q, int r), GrowTile>(slots.Count);
+		var byGrid = new Dictionary<(int x, int y), GrowTile>(slots.Count);
 		foreach (GrowTile slot in slots)
 		{
 			BoardSlotPosition p = slot.position;
-			byAxial[(p.x, p.y)] = slot;
+			byGrid[(p.x, p.y)] = slot;
 		}
 
 		foreach (GrowTile slot in slots)
@@ -99,7 +119,8 @@ public static class BoardGeneration
 			BoardSlotPosition p = slot.position;
 			foreach ((int dq, int dr, EDirection dir) in HexAxialNeighbours)
 			{
-				if (byAxial.TryGetValue((p.x + dq, p.y + dr), out GrowTile neighbour))
+				BoardSlotPosition n = NeighborInStoredGrid(p, dq, dr);
+				if (byGrid.TryGetValue((n.x, n.y), out GrowTile neighbour))
 					slot.SetNeighbour(dir, neighbour);
 			}
 		}

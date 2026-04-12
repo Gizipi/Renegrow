@@ -17,6 +17,7 @@ public class TileData : ScriptableObject
     [SerializeField]
     public TileSprites[] startTileSprites;
     public Dictionary<ESeason, Sprite> tileSprites = new();
+    public List<ETileType> spreadableTiles = new();
 
     private void OnEnable()
     {

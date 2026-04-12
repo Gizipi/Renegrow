@@ -94,8 +94,14 @@ public class ReadmeEditor : Editor
 
     protected override void OnHeaderGUI()
     {
-        var readme = (Readme)target;
         Init();
+        if (!m_Initialized)
+        {
+            base.OnHeaderGUI();
+            return;
+        }
+
+        var readme = (Readme)target;
 
         var iconWidth = Mathf.Min(EditorGUIUtility.currentViewWidth / 3f - 20f, 128f);
 
@@ -122,8 +128,14 @@ public class ReadmeEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        var readme = (Readme)target;
         Init();
+        if (!m_Initialized)
+        {
+            DrawDefaultInspector();
+            return;
+        }
+
+        var readme = (Readme)target;
 
         foreach (var section in readme.sections)
         {
@@ -156,50 +168,28 @@ public class ReadmeEditor : Editor
 
     bool m_Initialized;
 
-    GUIStyle LinkStyle
-    {
-        get { return m_LinkStyle; }
-    }
-
-    [SerializeField]
+    GUIStyle LinkStyle => m_LinkStyle;
     GUIStyle m_LinkStyle;
 
-    GUIStyle TitleStyle
-    {
-        get { return m_TitleStyle; }
-    }
-
-    [SerializeField]
+    GUIStyle TitleStyle => m_TitleStyle;
     GUIStyle m_TitleStyle;
 
-    GUIStyle HeadingStyle
-    {
-        get { return m_HeadingStyle; }
-    }
-
-    [SerializeField]
+    GUIStyle HeadingStyle => m_HeadingStyle;
     GUIStyle m_HeadingStyle;
 
-    GUIStyle BodyStyle
-    {
-        get { return m_BodyStyle; }
-    }
-
-    [SerializeField]
+    GUIStyle BodyStyle => m_BodyStyle;
     GUIStyle m_BodyStyle;
 
-    GUIStyle ButtonStyle
-    {
-        get { return m_ButtonStyle; }
-    }
-
-    [SerializeField]
+    GUIStyle ButtonStyle => m_ButtonStyle;
     GUIStyle m_ButtonStyle;
 
     void Init()
     {
         if (m_Initialized)
             return;
+        if (GUI.skin == null)
+            return;
+
         m_BodyStyle = new GUIStyle(EditorStyles.label);
         m_BodyStyle.wordWrap = true;
         m_BodyStyle.fontSize = 14;

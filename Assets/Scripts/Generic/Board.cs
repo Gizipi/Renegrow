@@ -4,10 +4,10 @@ using System.Collections.Generic;
 public class Board 
 {
     private Dictionary<int, Dictionary<int, BoardSlot>> _slots = new();
-    private MatchEvents _events;
+    private SeasonEvents _events;
     private BoardData _boardData;
 
-    public Board(BoardSlot[] slots, BoardData boardData, MatchEvents events)
+    public Board(BoardSlot[] slots, BoardData boardData, SeasonEvents events)
     {
         _boardData = boardData;
         _events = events;

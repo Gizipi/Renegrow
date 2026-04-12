@@ -1,11 +1,9 @@
 using UnityEngine;
 public enum EPlantGrowthStage
 {
-    Seed,
     Seedling,
     Young,
     Mature,
-    Dead,
 }
 
 public enum ELeafType

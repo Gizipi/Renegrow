@@ -18,11 +18,7 @@ public class Plant
 	{
 		get
 		{
-			if (_plantData.growthStages.ContainsKey(_growthStage))
-			{
-				return _leaves.Count >= CurrentGrowthStage.capacity;
-			}
-			return true;
+			return _leaves.Count >= CurrentGrowthStage.capacity;
 		}
 	}
 
@@ -34,8 +30,7 @@ public class Plant
 			return _leaves;
 		}
 	}
-	private EPlantGrowthStage _growthStage = EPlantGrowthStage.Seed;
-	private PlantGrowthStage _previousGrowthStage;
+	private EPlantGrowthStage _growthStage = EPlantGrowthStage.Seedling;
 	private readonly GameObject _plantVisual;
 	public GameObject PlantVisual
 	{
@@ -54,12 +49,21 @@ public class Plant
 	private readonly SpriteRenderer _plantSpriteRenderer;
 	private readonly CapacityUi _capacityParent;
 	private ESeason _currentSeason = ESeason.Spring;
+	private bool _isDead = false;
+	public bool IsDead
+	{
+		get
+		{
+			return _isDead;
+		}
+	}
 
 	public Plant(UiData uiData, PlantData plantData)
 	{
 		try
 		{
 			_capacityParent = GameObject.Instantiate(uiData.CapacityUiPrefab).GetComponent<CapacityUi>();
+			_capacityParent.Initialize(uiData);
 		}
 		catch (Exception e)
 		{
@@ -70,6 +74,8 @@ public class Plant
 		_plantData = plantData;
 		_plantVisual = plantVisual;
 		_plantSpriteRenderer = _plantVisual.GetComponent<SpriteRenderer>();
+		SetCapacity();
+		_capacityParent.gameObject.SetActive(false);
 	}
 
 	public void SetPosition(Vector3 position)
@@ -83,8 +89,7 @@ public class Plant
 	public void Seed()
 	{
 		Debug.Log("Seed");
-		_previousGrowthStage = CurrentGrowthStage;
-		_growthStage = EPlantGrowthStage.Seed;
+		_growthStage = EPlantGrowthStage.Seedling;
 		SetSprite();
 	}
 
@@ -99,19 +104,38 @@ public class Plant
 		SetSprite();
 	}
 
+	private void EndureColdSeason()
+	{
+		if(_isDead)
+			return;
+		int requiredLeaves = Mathf.Max(1, Mathf.FloorToInt(CurrentGrowthStage.capacity * 0.5f));
+		if (_leaves.Count < requiredLeaves)
+		{
+			Die();
+		}
+		else
+		{
+			for (int i = 0; i < requiredLeaves; i++)
+			{
+				RemoveLeaf();
+			}
+		}
+	}
+
 	private void SetSprite()
 	{
-		if (_growthStage == EPlantGrowthStage.Dead)
+		if (_isDead)
 		{
-			_plantSpriteRenderer.sprite = _plantData.growthStages[_previousGrowthStage.growthStage].deadVisual;
+			_plantSpriteRenderer.sprite = CurrentGrowthStage.deadVisual;
 			return;
 		}
 		_plantSpriteRenderer.sprite = CurrentGrowthStage.livingVisual;
-		Debug.Log("Set sprite " + _plantSpriteRenderer.sprite.name);
 	}
 
 	protected void Produce(ESeason season)
 	{
+		if(_isDead)
+			return;
 		if (IsAtCapacity)
 			return;
 		PlantGrowthStage growthStage = CurrentGrowthStage;
@@ -129,12 +153,16 @@ public class Plant
 		}
 	}
 
+	public void RemoveLeaf()
+	{
+		RemoveLeaf(_leaves[0]);
+		_capacityParent.RemoveResource(_leaves[0]);
+	}
+
 	public void RemoveLeaf(ELeafType leafType)
 	{
 		_leaves.Remove(leafType);
 		_capacityParent.RemoveResource(leafType);
-
-		Debug.Log("Removed leaf " + leafType + " from plant " + _plantData.name + " " + _leaves.Count);
 	}
 
 	public bool AddLeaf(ELeafType leafType)
@@ -145,32 +173,35 @@ public class Plant
 		_leaves.Add(leafType);
 		_capacityParent.AddResource(leafType);
 		Debug.Log("Added leaf " + leafType + " to plant " + _plantData.name + " " + _leaves.Count);
-		if (_growthStage == EPlantGrowthStage.Dead)
+		if (_isDead)
 			Revive();
 		return true;
 	}
 
 	public void Grow()
 	{
-		if (_growthStage == EPlantGrowthStage.Dead || _growthStage == EPlantGrowthStage.Mature)
+		if (_isDead || _growthStage == EPlantGrowthStage.Mature)
 			return;
 
 		_growthStage++;
 		SetSprite();
+		SetCapacity();
 	}
 
 	public void Revive()
 	{
-		_previousGrowthStage = CurrentGrowthStage;
-		_growthStage = EPlantGrowthStage.Seed;
+		_isDead = false;
 		SetSprite();
 		SetCapacity();
 	}
 
 	public void Die()
 	{
-		_previousGrowthStage = CurrentGrowthStage;
-		_growthStage = EPlantGrowthStage.Dead;
+		_isDead = true;
+		foreach (ELeafType leafType in _leaves)
+		{
+			_capacityParent.RemoveResource(leafType);
+		}
 		_leaves.Clear();
 		SetSprite();
 		SetCapacity();
@@ -184,16 +215,19 @@ public class Plant
 	public void OnHoverStart()
 	{
 		Debug.Log("OnHover");
+		_capacityParent.gameObject.SetActive(true);
 	}
 
 	public void OnHoverEnd()
 	{
 		Debug.Log("OnHoverEnd");
+		_capacityParent.gameObject.SetActive(false);
 	}
 
 	private void SetCapacity()
 	{
 		int capacity = CurrentGrowthStage.capacity;
+		Debug.Log("Setting capacity: " + capacity + ", current leaves count: " + _leaves.Count + ", at growth stage: " + _growthStage);
 		_capacityParent.SetCapacity(capacity);
 		if (capacity < _leaves.Count)
 		{

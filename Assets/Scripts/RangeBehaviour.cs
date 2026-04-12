@@ -78,15 +78,26 @@ public class RangeBehaviour
 	private void Execute(GrowTile targetSlot)
 	{
 		Debug.Log("Attempt Execute");
-		if (!_targets.Contains(targetSlot) || targetSlot == _slot)
+		if (!_targets.Contains(targetSlot))
 		{
-			Debug.Log("Execute: Target slot is not in targets or is the same as the starting slot");
+			ClearTargets();
 			return;
 		}
 
-		Debug.Log("Executing ");
-		targetSlot.Seed(_slot.Plant);
+		if (targetSlot == _slot)
+		{
+			targetSlot.Spread();
+		}
+		else
+		{
+			targetSlot.Seed(_slot.Plant);
+		}
+		ClearTargets();
+	}
 
+	private void ClearTargets()
+	{
+		Debug.Log("Clearing targets");
 		_targets.Clear();
 		_slot = null;
 		_range = 0;

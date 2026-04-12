@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.Port;
 
 [System.Serializable]
 public class ResourceSprites
@@ -13,10 +12,9 @@ public class ResourceSprites
 [CreateAssetMenu(fileName = "UiData", menuName = "UiData")]
 public class UiData : ScriptableObject
 {
-	public CapacityUi CapacityUiPrefab;
+	public GameObject CapacityUiPrefab;
 	public ResourceSprites[] ResourceSprites;
 	public Dictionary<ELeafType, Sprite> ResourceSpritesDictionary = new();
-	public GameObject OptionsParent;
 
 	private void OnEnable()
 	{

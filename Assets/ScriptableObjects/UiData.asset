@@ -12,12 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ae6e4f070c45034abda563e3ddf097b, type: 3}
   m_Name: UiData
   m_EditorClassIdentifier: Assembly-CSharp::UiData
-  CapacityUiPrefab: {fileID: 4873432001659989350, guid: b8520bda6a092cb4d99d5dae4332c5bf, type: 3}
+  CapacityUiPrefab: {fileID: 2661803152014749217, guid: b8520bda6a092cb4d99d5dae4332c5bf, type: 3}
   ResourceSprites:
   - ResourceType: 0
-    ResourceSprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    ResourceSprite: {fileID: -2139967453, guid: 0b92cb6a74e26034d87bbf84b77f290d, type: 3}
   - ResourceType: 1
     ResourceSprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   - ResourceType: 2
     ResourceSprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  OptionsParent: {fileID: 6733817935757098294, guid: c3827559e0bf32644a4b07d1f57e5088, type: 3}

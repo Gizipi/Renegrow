@@ -22,3 +22,4 @@ MonoBehaviour:
     sprite: {fileID: 233863221, guid: 551b794de900ad644abbfed325302d2f, type: 3}
   - season: 3
     sprite: {fileID: 233863221, guid: 551b794de900ad644abbfed325302d2f, type: 3}
+  spreadableTiles: 00000000
