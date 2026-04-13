@@ -1,18 +1,21 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameInitializer : MonoBehaviour
 {
     public CoreData coreData;
     private Match _match;
     public Camera mainCamera;
-    public LayerMask boardSlotLayerMask;
     public SeasonData seasonData;
+    public ProgressData progressData;
+    public LayerMask boardSlotLayerMask;
+    public Slider progressBar;
 
     public void Start()
     {
         BankMusic();
-        Board board = BoardGeneration.GenerateBoard(coreData, seasonData);
-        _match = new Match(board, seasonData.Events, coreData.audioBank);
+        Board board = new Board(coreData.boardData);
+        _match = new Match(board, seasonData, coreData.audioBank, new ProgressBar(progressBar, progressData), coreData);
         _match.AddBehaviour(new MouseTracker(board, mainCamera, boardSlotLayerMask));
         _match.Enable();
     }

@@ -34,13 +34,8 @@ public static class BoardGeneration
 		int rAx = AxialRFromStored(p.x, p.y);
 		return StoredFromAxial(p.x + dqAxial, rAx + drAxial);
 	}
-	public static Board GenerateBoard(CoreData coreData, SeasonData seasonData)
-	{
-		Board board = new Board(GenerateSlots(coreData, seasonData), coreData.boardData, seasonData.Events);
-		return board;
-	}
 
-	private static BoardSlot[] GenerateSlots(CoreData coreData, SeasonData seasonData)
+	public static BoardSlot[] GenerateSlots(CoreData coreData, SeasonData seasonData)
 	{
 		List<GrowTile> slots = new List<GrowTile>();
 		Dictionary<ETileType, int> tileCapacities = new Dictionary<ETileType, int>();
@@ -68,7 +63,7 @@ public static class BoardGeneration
 			slotCount += tile.count;
 		}
 
-		int[] plantIndexes = GeneratePlantIndexes(coreData.boardGenerationData.deadPlantCount, slotCount);
+		List<int> plantIndexes = GeneratePlantIndexes(coreData.boardGenerationData.deadPlantCount, slotCount);
 		RangeBehaviour rangeBehaviour = new RangeBehaviour();
 		bool hasPlantedStartingPlant = false;
 
@@ -89,14 +84,22 @@ public static class BoardGeneration
 			if (tileData.tileType == ETileType.Grass && !hasPlantedStartingPlant)
 			{
 				Debug.Log("Seed grass");
-				slot.Seed(coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]);
+				PlantData plantData = coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)];
+				slot.Seed(plantData);
 				slot.Plant.Grow();
 				slot.Plant.Grow();
+				slot.Plant.Produce(ESeason.Spring);
 				hasPlantedStartingPlant = true;
 			}
 			else if (plantIndexes.Contains(i))
 			{
 				Debug.Log("Seed plant");
+				if (slot.Plant != null)
+				{
+					plantIndexes.Remove(i);
+					plantIndexes.Add(GetRandomPlantIndex(i, slotCount));
+					continue;
+				}
 				slot.Seed(coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]);
 				slot.Plant.Grow();
 				slot.Plant.Die();
@@ -128,16 +131,20 @@ public static class BoardGeneration
 		}
 	}
 
-	private static int[] GeneratePlantIndexes(int deadPlantCount, int tileCount)
+	private static List<int> GeneratePlantIndexes(int deadPlantCount, int tileCount)
 	{
 		Debug.Log("Generating plant indexes " + deadPlantCount + " " + tileCount);
 		List<int> plantIndexes = new List<int>();
 		for (int i = 0; i < deadPlantCount + 1; i++)
 		{
-			int randomIndex = Random.Range(0, tileCount);
+			int randomIndex = GetRandomPlantIndex(0, tileCount);
 			Debug.Log("Generate plant index " + i + " " + randomIndex);
 			plantIndexes.Add(randomIndex);
 		}
-		return plantIndexes.ToArray();
+		return plantIndexes;
+	}
+
+	private static int GetRandomPlantIndex(int min, int max) {
+		return Random.Range(min, max);
 	}
 }

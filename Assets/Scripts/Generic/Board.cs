@@ -1,31 +1,19 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Board 
+public class Board : IBoard
 {
-    private Dictionary<int, Dictionary<int, BoardSlot>> _slots = new();
-    private SeasonEvents _events;
-    private BoardData _boardData;
+    private readonly BoardEvents _events = new();
+    public BoardEvents Events => _events;
+    private readonly BoardData _boardData;
+    public BoardData BoardData => _boardData;
+    private readonly Dictionary<int, Dictionary<int, BoardSlot>> _slots = new();
+    private readonly List<BoardSlot> _slotsList = new();
+    public BoardSlot[] Slots => _slotsList.ToArray();
 
-    public Board(BoardSlot[] slots, BoardData boardData, SeasonEvents events)
+    public Board(BoardData boardData)
     {
         _boardData = boardData;
-        _events = events;
-        SubscribeToEvents();
-        foreach (BoardSlot slot in slots)
-        {
-            SetSlot(slot.position, slot);
-        }
-    }
-
-    private void SubscribeToEvents()
-    {
-        _events.onSeasonChange += OnSeasonChange;
-    }
-
-    private void OnSeasonChange(ESeason season)
-    {
-
     }
 
     public void ReplaceAllSlots(BoardSlot[] slots)
@@ -38,10 +26,15 @@ public class Board
             }
         }
         _slots.Clear();
+        _slotsList.Clear();
+        SetSlots(slots);
+    }
+
+    private void SetSlots(BoardSlot[] slots)
+    {
         foreach (BoardSlot slot in slots)
         {
             SetSlot(slot.position, slot);
-            slot.Added();
         }
     }
 
@@ -57,6 +50,8 @@ public class Board
             _slots[position.x] = new Dictionary<int, BoardSlot>();
         }
         _slots[position.x][position.y] = slot;
+        _slotsList.Add(slot);
+        _events.TileAdded(slot);
     }
 
     public BoardSlot RemoveSlot(BoardSlotPosition position)
@@ -67,7 +62,9 @@ public class Board
         {
             _slots.Remove(position.x);
         }
+        _slotsList.Remove(slot);
         slot.Removed();
+        _events.TileRemoved(slot);
         return slot;
     }
 }

@@ -97,7 +97,12 @@ public class Plant
 	{
 		Debug.Log("Plant: ChangeSeason to " + season);
 		_currentSeason = season;
-		if (season == ESeason.Spring)
+
+		if(season == ESeason.Winter)
+		{
+			EndureColdSeason();
+		}
+		else if (season == ESeason.Spring)
 		{
 			Grow();
 		}
@@ -116,6 +121,7 @@ public class Plant
 		}
 		else
 		{
+			Debug.Log("Enduring cold season, removing " + requiredLeaves + " leaves");
 			for (int i = 0; i < requiredLeaves; i++)
 			{
 				RemoveLeaf();
@@ -133,7 +139,7 @@ public class Plant
 		_plantSpriteRenderer.sprite = CurrentGrowthStage.livingVisual;
 	}
 
-	protected void Produce(ESeason season)
+	public void Produce(ESeason season)
 	{
 		if(_isDead)
 			return;
@@ -143,7 +149,6 @@ public class Plant
 		if (!growthStage.productionSeasons.Contains(season))
 			return;
 
-		Debug.Log("Plant: Producing " + growthStage.production.Length + " leaves for " + season);
 		foreach (LeafGroup production in growthStage.production)
 		{
 			for (int i = 0; i < production.count; i++)
@@ -157,8 +162,8 @@ public class Plant
 
 	public void RemoveLeaf()
 	{
-		RemoveLeaf(_leaves[0]);
 		_capacityParent.RemoveResource(_leaves[0]);
+		RemoveLeaf(_leaves[0]);
 	}
 
 	public void RemoveLeaf(ELeafType leafType)
@@ -174,9 +179,9 @@ public class Plant
 
 		_leaves.Add(leafType);
 		_capacityParent.AddResource(leafType);
-		Debug.Log("Added leaf " + leafType + " to plant " + _plantData.name + " " + _leaves.Count);
 		if (_isDead)
 			Revive();
+		
 		return true;
 	}
 
@@ -200,9 +205,11 @@ public class Plant
 	public void Die()
 	{
 		_isDead = true;
-		foreach (ELeafType leafType in _leaves)
+		Debug.Log("Die, removing " + _leaves.Count + " leaves");
+		int leavesToRemove = _leaves.Count;
+		for (int i = 0; i < leavesToRemove; i++)
 		{
-			_capacityParent.RemoveResource(leafType);
+			RemoveLeaf();
 		}
 		_leaves.Clear();
 		SetSprite();

@@ -89,7 +89,7 @@ public abstract class BoardSlot
 
     public virtual void Removed()
     {
-        _slotVisual.SetActive(false);
+        GameObject.Destroy(_slotVisual);
     }
 
     public virtual void OnClicked()

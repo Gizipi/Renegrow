@@ -4,6 +4,7 @@ using System;
 
 public class GrowTile : BoardSlot
 {
+	public readonly GrowTileEvents events = new();
 	private Plant _plant;
 	public Plant Plant
 	{
@@ -29,16 +30,15 @@ public class GrowTile : BoardSlot
 
 	public GrowTile(GameObject tileVisual, UiData uiData, BoardData boardData, TileData tileData, RangeBehaviour rangeBehaviour) : base(tileVisual, boardData)
 	{
-		_tileData = tileData;
 		_uiData = uiData;
 
 		_tileSpriteRenderer = _slotVisual.GetComponent<SpriteRenderer>();
 		_rangeBehaviour = rangeBehaviour;
+		SetTileData(tileData);
 	}
 
 	public void ProvideEvents(SeasonEvents events)
 	{
-		Debug.Log("GrowTile: ProvideEvents");
 		_matchEvents = events;
 		SubscribeToEvents();
 	}
@@ -48,9 +48,13 @@ public class GrowTile : BoardSlot
 		_matchEvents.onSeasonChange += OnSeasonChange;
 	}
 
+	private void UnsubscribeFromEvents()
+	{
+		_matchEvents.onSeasonChange -= OnSeasonChange;
+	}
+
 	private void OnSeasonChange(ESeason season)
 	{
-		Debug.Log("GrowTile: OnSeasonChange to " + season);
 		ChangeSeason(season);
 	}
 
@@ -73,13 +77,11 @@ public class GrowTile : BoardSlot
 			return;
 		}
 
-		_plant = new Plant(_uiData, plant.PlantData);
 		if (plant.Leaves.Count > 0)
 		{
 			plant.RemoveLeaf(plant.Leaves[0]);
 		}
-		_plant.Seed();
-		SetPlantPosition();
+		Seed(plant.PlantData);
 	}
 
 	public void Seed(PlantData plantData)
@@ -87,17 +89,16 @@ public class GrowTile : BoardSlot
 		_plant = new Plant(_uiData, plantData);
 		_plant.Seed();
 		SetPlantPosition();
+		events.PlantSeeded(_plant);
 	}
 
 	public void Spread()
 	{
-		Debug.Log("attempting to spread");
 		if (_plant == null)
 			return;
 		if (_plant.Leaves.Count <= 0)
 			return;
 
-		Debug.Log("spreading");
 		foreach (EDirection direction in Enum.GetValues(typeof(EDirection)))
 		{
 			if (!neighbours.ContainsKey(direction))
@@ -118,6 +119,7 @@ public class GrowTile : BoardSlot
 	{
 		_tileData = tileData;
 		_tileSpriteRenderer.sprite = _tileData.tileSprites[_currentSeason];
+		events.TileDataChanged(_tileData);
 	}
 
 	public void TransferLeaf(Plant plant)
@@ -153,7 +155,13 @@ public class GrowTile : BoardSlot
 	public override void Removed()
 	{
 		base.Removed();
-		_plant = null;
+		if (_plant != null)
+		{
+			GameObject.Destroy(_plant.PlantVisual);
+			_plant = null;
+		}
+		events.TileRemoved();
+		UnsubscribeFromEvents();
 	}
 
 	public override void OnClicked()
