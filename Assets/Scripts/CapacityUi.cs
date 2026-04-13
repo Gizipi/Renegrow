@@ -8,7 +8,7 @@ public class CapacityUi : MonoBehaviour
 	public GameObject CapacityPrefab;
 	public GameObject ResourcePrefab;
 
-	public float OrbitRadius = 0.1f;
+	public float OrbitRadius = 0.3f;
 	public float MinNeighborAngleDegrees = 14f;
 
 	private UiData _uiData;

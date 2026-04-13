@@ -95,6 +95,7 @@ public class Plant
 
 	public void ChangeSeason(ESeason season)
 	{
+		Debug.Log("Plant: ChangeSeason to " + season);
 		_currentSeason = season;
 		if (season == ESeason.Spring)
 		{
@@ -142,6 +143,7 @@ public class Plant
 		if (!growthStage.productionSeasons.Contains(season))
 			return;
 
+		Debug.Log("Plant: Producing " + growthStage.production.Length + " leaves for " + season);
 		foreach (LeafGroup production in growthStage.production)
 		{
 			for (int i = 0; i < production.count; i++)

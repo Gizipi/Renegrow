@@ -38,7 +38,14 @@ public class SeasonData : ScriptableObject
 		private void OnEnable()
 		{
 			RebuildSeasonSprites();
+			Events.onSeasonChange += OnSeasonChange;
 		}
+		
+		private void OnDisable()
+		{
+			Events.onSeasonChange -= OnSeasonChange;
+		}
+
 #if UNITY_EDITOR
 		private void OnValidate()
 		{
@@ -76,5 +83,10 @@ public class SeasonData : ScriptableObject
 				_currentSeason = ESeason.Spring;
 			}
 			Events.SeasonChange(_currentSeason);
+		}
+
+		private void OnSeasonChange(ESeason season)
+		{
+			_currentSeason = season;
 		}
 }

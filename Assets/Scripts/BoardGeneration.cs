@@ -70,6 +70,7 @@ public static class BoardGeneration
 
 		int[] plantIndexes = GeneratePlantIndexes(coreData.boardGenerationData.deadPlantCount, slotCount);
 		RangeBehaviour rangeBehaviour = new RangeBehaviour();
+		bool hasPlantedStartingPlant = false;
 
 		for (int i = 0; i < slotCount; i++)
 		{
@@ -85,12 +86,13 @@ public static class BoardGeneration
 			slot.SetPosition(position);
 			slots.Add(slot);
 			tileCounts[tileData.tileType]++;
-			if (tileData.tileType == ETileType.Grass)
+			if (tileData.tileType == ETileType.Grass && !hasPlantedStartingPlant)
 			{
 				Debug.Log("Seed grass");
 				slot.Seed(coreData.boardGenerationData.plants[Random.Range(0, coreData.boardGenerationData.plants.Length - 1)]);
 				slot.Plant.Grow();
 				slot.Plant.Grow();
+				hasPlantedStartingPlant = true;
 			}
 			else if (plantIndexes.Contains(i))
 			{

@@ -47,3 +47,5 @@ MonoBehaviour:
   CapacitySprite: {fileID: 1399616170, guid: 51d1ffc93c08d5f49924e40f8577b7b3, type: 3}
   CapacityPrefab: {fileID: 3135293854284482797, guid: ff2ef2ba9be094e43b8e94bb144a16b7, type: 3}
   ResourcePrefab: {fileID: 8169712177186691831, guid: 69d251fdfc956044d9e22f72b0fc1cd9, type: 3}
+  OrbitRadius: 0.3
+  MinNeighborAngleDegrees: 14

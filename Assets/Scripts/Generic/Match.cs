@@ -55,6 +55,8 @@ public class Match
 
     public virtual void StartMatch()
     {
+        Debug.Log("Match: StartMatch");
+        _state = EMatchState.Playing;
         _events.onSeasonChange += OnSeasonChange;
         _events.SeasonChange(_currentSeason);
     }
@@ -62,12 +64,7 @@ public class Match
     private void OnSeasonChange(ESeason season)
     {
         _audioBank.StopAudio(_currentSeason.ToString());
-        _currentSeason++;
-        if (_currentSeason > ESeason.Winter)
-        {
-            _currentSeason = ESeason.Spring;
-        }
-        _state = EMatchState.Playing;
+        _currentSeason = season;
         _audioBank.PlayAudio(_currentSeason.ToString(), true);
     }
 }

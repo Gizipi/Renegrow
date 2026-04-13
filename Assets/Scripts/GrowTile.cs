@@ -38,6 +38,7 @@ public class GrowTile : BoardSlot
 
 	public void ProvideEvents(SeasonEvents events)
 	{
+		Debug.Log("GrowTile: ProvideEvents");
 		_matchEvents = events;
 		SubscribeToEvents();
 	}
@@ -49,6 +50,7 @@ public class GrowTile : BoardSlot
 
 	private void OnSeasonChange(ESeason season)
 	{
+		Debug.Log("GrowTile: OnSeasonChange to " + season);
 		ChangeSeason(season);
 	}
 
