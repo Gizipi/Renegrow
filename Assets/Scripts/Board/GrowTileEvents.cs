@@ -19,6 +19,14 @@ public class GrowTileEvents
 			onPlantSeeded(plant);
 	}
 
+	public delegate void OnSpread();
+	public event OnSpread onSpread;
+	public void Spread()
+	{
+		if (onSpread != null)
+			onSpread();
+	}
+
 	public delegate void OnTileRemoved();
 	public event OnTileRemoved onTileRemoved;
 	public void TileRemoved()

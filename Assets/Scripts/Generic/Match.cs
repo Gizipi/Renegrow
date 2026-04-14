@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static SeasonEvents;
-using static ProgressBar;
 using System.Threading.Tasks;
 
 public class Match
 {
-    private EMatchState _state = EMatchState.Idle;
     private Board _board;
+    private MatchState _state = new();
     private SeasonData _seasonData;
     private ESeason _currentSeason = ESeason.Winter;
     private List<IMatchBehaviour> _behaviour = new();
@@ -43,12 +41,12 @@ public class Match
 
     public virtual void Update(float deltaTime)
     {
-        if (_state != EMatchState.Playing)
+        if (_state.State != EMatchState.Playing)
             return;
 
         foreach (IMatchBehaviour behaviour in _behaviour)
         {
-            if (behaviour.ActiveStates.Contains(_state))
+            if (behaviour.ActiveStates.Contains(_state.State))
             {
                 behaviour.Update(deltaTime);
             }
@@ -57,13 +55,13 @@ public class Match
 
     public virtual async Task StartMatch()
     {
-        if (_state == EMatchState.Playing)
+        if (_state.State == EMatchState.Playing)
         {
             return;
         }
 
         Debug.Log("Match: StartMatch");
-        _state = EMatchState.Playing;
+        _state.SetState(EMatchState.Playing);
         _progressBar.onProgressCompleted += async () => await OnProgressCompleted();
         _progressBar.Activate(_board);
         _board.ReplaceAllSlots(BoardGeneration.GenerateSlots(_coreData, _seasonData));
@@ -81,7 +79,7 @@ public class Match
     private void EndMatch()
     {
         _progressBar.onProgressCompleted -= async () => await OnProgressCompleted();
-        _state = EMatchState.GameOver;
+        _state.SetState(EMatchState.GameOver);
         _seasonData.Events.onSeasonChange -= OnSeasonChange;
         _progressBar.Deactivate();
         StartMatch();

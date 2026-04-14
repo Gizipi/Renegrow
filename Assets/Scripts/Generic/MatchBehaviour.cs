@@ -1,6 +1,7 @@
 public enum EMatchState
 {
     Idle,
+    Animating,
     Playing,
     Paused,
     GameOver,

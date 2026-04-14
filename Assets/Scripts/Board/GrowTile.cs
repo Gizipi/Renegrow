@@ -15,6 +15,7 @@ public class GrowTile : BoardSlot
 	}
 	private readonly CapacityUi _capacityParent;
 	private readonly SpriteRenderer _tileSpriteRenderer;
+	public SpriteRenderer TileSpriteRenderer => _tileSpriteRenderer;
 	private TileData _tileData;
 	public TileData TileData
 	{
@@ -60,7 +61,7 @@ public class GrowTile : BoardSlot
 
 	public async void ChangeSeason(ESeason season)
 	{
-		_tileSpriteRenderer.sprite = _tileData.tileSprites[season];
+		_tileSpriteRenderer.sprite = _tileData.tileSprites[season].sprite;
 		_currentSeason = season;
 		if (_plant != null)
 		{
@@ -143,7 +144,7 @@ public class GrowTile : BoardSlot
 
 		Debug.Log("SetTileData " + tileData.tileType);
 		_tileData = tileData;
-		_tileSpriteRenderer.sprite = _tileData.tileSprites[_currentSeason];
+		_tileSpriteRenderer.sprite = _tileData.tileSprites[_currentSeason].sprite;
 		events.TileDataChanged(_tileData);
 	}
 
