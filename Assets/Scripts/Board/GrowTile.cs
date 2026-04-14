@@ -1,6 +1,6 @@
 using UnityEngine;
-using static SeasonEvents;
 using System;
+using System.Threading.Tasks;
 
 public class GrowTile : BoardSlot
 {
@@ -58,12 +58,22 @@ public class GrowTile : BoardSlot
 		ChangeSeason(season);
 	}
 
-	public void ChangeSeason(ESeason season)
+	public async void ChangeSeason(ESeason season)
 	{
 		_tileSpriteRenderer.sprite = _tileData.tileSprites[season];
 		_currentSeason = season;
 		if (_plant != null)
+		{
 			_plant.ChangeSeason(season);
+			return;
+		}
+
+		if (season == ESeason.Summer && _tileData.tileType == ETileType.dirt)
+		{
+			Debug.Log("Spread dirt");
+			await Task.Delay(10);
+			Spread();
+		}
 	}
 
 	public void Seed(Plant plant)
@@ -94,11 +104,14 @@ public class GrowTile : BoardSlot
 
 	public void Spread()
 	{
-		if (_plant == null)
-			return;
-		if (_plant.Leaves.Count <= 0)
+		Debug.Log("attempt Spread " + _tileData.tileType);
+		if (_plant != null &&
+		_plant.Leaves.Count <= 0 &&
+		(_tileData.tileType == ETileType.Grass ||
+		_tileData.tileType == ETileType.Water))
 			return;
 
+		Debug.Log("Spreading: " + _tileData.tileType);
 		foreach (EDirection direction in Enum.GetValues(typeof(EDirection)))
 		{
 			if (!neighbours.ContainsKey(direction))
@@ -109,17 +122,42 @@ public class GrowTile : BoardSlot
 
 			if (_tileData.spreadableTiles.Contains(neighbour.TileData.tileType))
 			{
+				Debug.Log("Setting tile data to " + neighbour.TileData.tileType + " from " + _tileData.tileType + " for neighbour " + direction);
 				neighbour.SetTileData(_tileData);
 			}
 		}
-		_plant.RemoveLeaf(_plant.Leaves[0]);
+		if (_plant != null && _plant.Leaves.Count > 0)
+			_plant.RemoveLeaf(_plant.Leaves[0]);
 	}
 
 	public void SetTileData(TileData tileData)
 	{
+		Debug.Log("attempt SetTileData " + tileData.tileType);
+		if (tileData.tileType == ETileType.dirt)
+		{
+			if (_plant != null)
+				return;
+			if (hasWaterNeighbour())
+				return;
+		}
+
+		Debug.Log("SetTileData " + tileData.tileType);
 		_tileData = tileData;
 		_tileSpriteRenderer.sprite = _tileData.tileSprites[_currentSeason];
 		events.TileDataChanged(_tileData);
+	}
+
+	private bool hasWaterNeighbour()
+	{
+		foreach (EDirection direction in Enum.GetValues(typeof(EDirection)))
+		{
+			if (!neighbours.ContainsKey(direction))
+				continue;
+			GrowTile neighbour = (GrowTile)neighbours[direction];
+			if (neighbour.TileData.tileType == ETileType.Water)
+				return true;
+		}
+		return false;
 	}
 
 	public void TransferLeaf(Plant plant)
