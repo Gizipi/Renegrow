@@ -7,6 +7,12 @@ public class RangeBehaviour
 	private GrowTile _slot;
 	private int _range;
 	private List<GrowTile> _targets;
+	private TargetDisplay _targetDisplay;
+
+	public RangeBehaviour(TargetDisplay targetDisplay)
+	{
+		_targetDisplay = targetDisplay;
+	}
 
 	public void ProvideTile(GrowTile slot)
 	{
@@ -73,6 +79,7 @@ public class RangeBehaviour
 			newTargets = nextTargets;
 			nextTargets.Clear();
 		}
+		_targetDisplay.SetTargets(_targets);
 	}
 
 	private void Execute(GrowTile targetSlot)
@@ -101,5 +108,6 @@ public class RangeBehaviour
 		_targets.Clear();
 		_slot = null;
 		_range = 0;
+		_targetDisplay.ClearTargets();
 	}
 }

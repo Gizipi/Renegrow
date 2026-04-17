@@ -64,7 +64,7 @@ public static class BoardGeneration
 		}
 
 		List<int> plantIndexes = GeneratePlantIndexes(coreData.boardGenerationData.deadPlantCount, slotCount);
-		RangeBehaviour rangeBehaviour = new RangeBehaviour();
+		RangeBehaviour rangeBehaviour = new RangeBehaviour(new TargetDisplay(new Board(coreData.boardData), coreData.targetData));
 		bool hasPlantedStartingPlant = false;
 
 		for (int i = 0; i < slotCount; i++)

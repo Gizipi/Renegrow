@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7199147746544441028}
   - component: {fileID: 647624307972234027}
   m_Layer: 0
-  m_Name: SummerMusic
+  m_Name: WinterMusic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: b829faea7cb9aaf4ab717e53591e217d, type: 3}
+  m_Resource: {fileID: 8300000, guid: 0060fcf5ad407774b9c9382462f7c624, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

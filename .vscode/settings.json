@@ -56,7 +56,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Regenegrow.sln",
+    "dotnet.defaultSolution": "Renegrow.sln",
     "csharp-dev-tools.roslyn.projectOrSolutionFiles": [
         "c:\\Stream Content\\Projects\\Regenegrow\\Regenegrow.sln"
     ]

@@ -34,4 +34,12 @@ public class GrowTileEvents
 		if (onTileRemoved != null)
 			onTileRemoved();
 	}
+
+	public delegate void OnTileSelected(GrowTile growTile);
+	public event OnTileSelected onTileSelected;
+	public void TileSelected(GrowTile growTile)
+	{
+		if (onTileSelected != null)
+			onTileSelected(growTile);
+	}
 }

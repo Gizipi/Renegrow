@@ -138,7 +138,7 @@ public class GrowTile : BoardSlot
 		{
 			if (_plant != null)
 				return;
-			if (hasWaterNeighbour())
+			if (BoardUtility.HasWaterNeighbour(this))
 				return;
 		}
 
@@ -147,20 +147,7 @@ public class GrowTile : BoardSlot
 		_tileSpriteRenderer.sprite = _tileData.tileSprites[_currentSeason].sprite;
 		events.TileDataChanged(_tileData);
 	}
-
-	private bool hasWaterNeighbour()
-	{
-		foreach (EDirection direction in Enum.GetValues(typeof(EDirection)))
-		{
-			if (!neighbours.ContainsKey(direction))
-				continue;
-			GrowTile neighbour = (GrowTile)neighbours[direction];
-			if (neighbour.TileData.tileType == ETileType.Water)
-				return true;
-		}
-		return false;
-	}
-
+	
 	public void TransferLeaf(Plant plant)
 	{
 		if (_plant.Leaves.Count >= _plant.CurrentGrowthStage.capacity || plant.Leaves.Count <= 0)
@@ -210,6 +197,7 @@ public class GrowTile : BoardSlot
 			_plant.OnClicked();
 		}
 		_rangeBehaviour.ProvideTile(this);
+		events.TileSelected(this);
 	}
 
 	public override void OnHoverStart()

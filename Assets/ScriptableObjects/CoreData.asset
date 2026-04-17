@@ -15,3 +15,4 @@ MonoBehaviour:
   uiData: {fileID: 11400000, guid: 2358f336a72555749976545b7c1d60db, type: 2}
   boardGenerationData: {fileID: 11400000, guid: 7f52ad38cd6985b4bb069b9b71b29a7a, type: 2}
   boardData: {fileID: 11400000, guid: d61650f49fcaf294888a210707631669, type: 2}
+  targetData: {fileID: 11400000, guid: a9137af89e64f484daa459b3fe819665, type: 2}
