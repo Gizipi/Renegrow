@@ -6,57 +6,21 @@ using UnityEngine;
 public class Plant
 {
 	private readonly PlantData _plantData;
-	public PlantData PlantData
-	{
-		get
-		{
-			return _plantData;
-		}
-	}
+	public PlantData PlantData => _plantData;
 
-	public bool IsAtCapacity
-	{
-		get
-		{
-			return _leaves.Count >= CurrentGrowthStage.capacity;
-		}
-	}
+	public bool IsAtCapacity => _leaves.Count >= CurrentGrowthStage.capacity;
 
 	private readonly List<ELeafType> _leaves = new();
-	public List<ELeafType> Leaves
-	{
-		get
-		{
-			return _leaves;
-		}
-	}
+	public List<ELeafType> Leaves => _leaves;
 	private EPlantGrowthStage _growthStage = EPlantGrowthStage.Seedling;
 	private readonly GameObject _plantVisual;
-	public GameObject PlantVisual
-	{
-		get
-		{
-			return _plantVisual;
-		}
-	}
-	public PlantGrowthStage CurrentGrowthStage
-	{
-		get
-		{
-			return _plantData.growthStages[_growthStage];
-		}
-	}
+	public GameObject PlantVisual => _plantVisual;
+	public PlantGrowthStage CurrentGrowthStage => _plantData.growthStages[_growthStage];
 	private readonly SpriteRenderer _plantSpriteRenderer;
 	private readonly CapacityUi _capacityParent;
 	private ESeason _currentSeason = ESeason.Spring;
 	private bool _isDead = false;
-	public bool IsDead
-	{
-		get
-		{
-			return _isDead;
-		}
-	}
+	public bool IsDead => _isDead;
 
 	public Plant(UiData uiData, PlantData plantData)
 	{
@@ -98,7 +62,7 @@ public class Plant
 		Debug.Log("Plant: ChangeSeason to " + season);
 		_currentSeason = season;
 
-		if(season == ESeason.Winter)
+		if (season == ESeason.Winter)
 		{
 			EndureColdSeason();
 		}
@@ -110,9 +74,14 @@ public class Plant
 		SetSprite();
 	}
 
+	public bool IsUnhealthy()
+	{
+		return _leaves.Count < Mathf.Max(1, Mathf.FloorToInt(CurrentGrowthStage.capacity * 0.5f));
+	}
+	
 	private void EndureColdSeason()
 	{
-		if(_isDead)
+		if (_isDead)
 			return;
 		int requiredLeaves = Mathf.Max(1, Mathf.FloorToInt(CurrentGrowthStage.capacity * 0.5f));
 		if (_leaves.Count < requiredLeaves)
@@ -141,7 +110,7 @@ public class Plant
 
 	public void Produce(ESeason season)
 	{
-		if(_isDead)
+		if (_isDead)
 			return;
 		if (IsAtCapacity)
 			return;
@@ -181,7 +150,7 @@ public class Plant
 		_capacityParent.AddResource(leafType);
 		if (_isDead)
 			Revive();
-		
+
 		return true;
 	}
 

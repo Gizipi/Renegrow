@@ -23,27 +23,16 @@ public class BoardSlotPosition
     }
 }
 
-public abstract class BoardSlot
+public abstract class BoardSlot : ISpriteButton
 {
+    public SpriteButtonEvents spriteButtonEvents { get; } = new();
     private readonly SpriteButton _spriteButton;
     private BoardSlotPosition _position;
-    public BoardSlotPosition position
-    {
-        get
-        {
-            return _position;
-        }
-    }
+    public BoardSlotPosition position => _position;
     protected readonly GameObject _slotVisual;
     protected readonly BoardData _boardData;
     protected Dictionary<EDirection, BoardSlot> _neighbours;
-    public Dictionary<EDirection, BoardSlot> neighbours
-    {
-        get
-        {
-            return _neighbours;
-        }
-    }
+    public Dictionary<EDirection, BoardSlot> neighbours => _neighbours;
     
     public BoardSlot(GameObject slotVisual, BoardData boardData)
     {
@@ -58,9 +47,9 @@ public abstract class BoardSlot
     {
         if (_spriteButton == null)
             return;
-        _spriteButton.events.onClick += OnClicked;
-        _spriteButton.events.onHoverStart += OnHoverStart;
-        _spriteButton.events.onHoverEnd += OnHoverEnd;
+        _spriteButton.spriteButtonEvents.onClick += OnClicked;
+        _spriteButton.spriteButtonEvents.onHoverStart += OnHoverStart;
+        _spriteButton.spriteButtonEvents.onHoverEnd += OnHoverEnd;
     }
 
     public virtual void SetPosition(BoardSlotPosition position)
@@ -94,16 +83,16 @@ public abstract class BoardSlot
 
     public virtual void OnClicked()
     {
-
+        spriteButtonEvents.Click();
     }
 
     public virtual void OnHoverStart()
     {
-        
+        spriteButtonEvents.HoverStart();
     }
 
     public virtual void OnHoverEnd()
     {
-        
+        spriteButtonEvents.HoverEnd();
     }
 }

@@ -2,6 +2,11 @@ using UnityEngine;
 using System;
 using static SeasonEvents;
 
+public interface ISpriteButton
+{
+    public SpriteButtonEvents spriteButtonEvents { get; }
+}
+
 public class SpriteButtonEvents
 {
     public delegate void OnClick();
@@ -29,28 +34,21 @@ public class SpriteButtonEvents
     }
 }
 
-public class SpriteButton : MonoBehaviour
+public class SpriteButton : MonoBehaviour, ISpriteButton
 {
-    private readonly SpriteButtonEvents _events = new();
-    public SpriteButtonEvents events
-    {
-        get
-        {
-            return _events;
-        }
-    }
+    public SpriteButtonEvents spriteButtonEvents { get; } = new();
     
     public void OnClick()
     {
         Debug.Log("SpriteButton: OnClick");
-        events.Click();
+        spriteButtonEvents.Click();
     }
     public void OnHoverStart()
     {
-        events.HoverStart();
+        spriteButtonEvents.HoverStart();
     }
     public void OnHoverEnd()
     {
-        events.HoverEnd();
+        spriteButtonEvents.HoverEnd();
     }
 }
